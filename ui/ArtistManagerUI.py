@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'C:\Users\Alex\Dropbox\Desenvolvimento\Python\ArtistTracker\designer\ArtistManagerUI.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_ArtistManager(object):
+	def setupUi(self, ArtistManager):
+		ArtistManager.setObjectName("ArtistManager")
+		ArtistManager.resize(594, 427)
+		self.centralwidget = QtWidgets.QWidget(ArtistManager)
+		self.centralwidget.setObjectName("centralwidget")
+		self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+		self.verticalLayout.setObjectName("verticalLayout")
+		self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+		sizePolicy.setHorizontalStretch(0)
+		sizePolicy.setVerticalStretch(0)
+		sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
+		self.tabWidget.setSizePolicy(sizePolicy)
+		self.tabWidget.setObjectName("tabWidget")
+		self.tab = QtWidgets.QWidget()
+		self.tab.setObjectName("tab")
+		self.listAlias = QtWidgets.QListWidget(self.tab)
+		self.listAlias.setGeometry(QtCore.QRect(10, 90, 551, 221))
+		self.listAlias.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+		self.listAlias.setObjectName("listAlias")
+		self.lineAliasName = QtWidgets.QLineEdit(self.tab)
+		self.lineAliasName.setGeometry(QtCore.QRect(10, 320, 141, 20))
+		self.lineAliasName.setObjectName("lineAliasName")
+		self.lineAliasUrl = QtWidgets.QLineEdit(self.tab)
+		self.lineAliasUrl.setGeometry(QtCore.QRect(160, 320, 171, 20))
+		self.lineAliasUrl.setObjectName("lineAliasUrl")
+		self.comboBoxServices = QtWidgets.QComboBox(self.tab)
+		self.comboBoxServices.setGeometry(QtCore.QRect(340, 320, 141, 22))
+		self.comboBoxServices.setObjectName("comboBoxServices")
+		self.pushSaveAlias = QtWidgets.QPushButton(self.tab)
+		self.pushSaveAlias.setGeometry(QtCore.QRect(490, 320, 31, 23))
+		self.pushSaveAlias.setObjectName("pushSaveAlias")
+		self.pushRemoveAlias = QtWidgets.QPushButton(self.tab)
+		self.pushRemoveAlias.setGeometry(QtCore.QRect(530, 320, 31, 23))
+		self.pushRemoveAlias.setObjectName("pushRemoveAlias")
+		self.labelName = QtWidgets.QLabel(self.tab)
+		self.labelName.setGeometry(QtCore.QRect(10, 10, 27, 16))
+		self.labelName.setObjectName("labelName")
+		self.pushDelete = QtWidgets.QPushButton(self.tab)
+		self.pushDelete.setEnabled(True)
+		self.pushDelete.setGeometry(QtCore.QRect(530, 10, 32, 23))
+		self.pushDelete.setMaximumSize(QtCore.QSize(32, 32))
+		self.pushDelete.setLayoutDirection(QtCore.Qt.LeftToRight)
+		self.pushDelete.setFlat(True)
+		self.pushDelete.setObjectName("pushDelete")
+		self.label = QtWidgets.QLabel(self.tab)
+		self.label.setGeometry(QtCore.QRect(10, 64, 33, 16))
+		self.label.setObjectName("label")
+		self.lineName = QtWidgets.QLineEdit(self.tab)
+		self.lineName.setGeometry(QtCore.QRect(10, 30, 141, 20))
+		self.lineName.setObjectName("lineName")
+		self.tabWidget.addTab(self.tab, "")
+		self.tab_1 = QtWidgets.QWidget()
+		self.tab_1.setObjectName("tab_1")
+		self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_1)
+		self.gridLayout_4.setObjectName("gridLayout_4")
+		self.gridLayout_3 = QtWidgets.QGridLayout()
+		self.gridLayout_3.setObjectName("gridLayout_3")
+		self.gridLayout_4.addLayout(self.gridLayout_3, 0, 0, 1, 1)
+		self.tabWidget.addTab(self.tab_1, "")
+		self.verticalLayout.addWidget(self.tabWidget)
+		self.horizontalLayout = QtWidgets.QHBoxLayout()
+		self.horizontalLayout.setObjectName("horizontalLayout")
+		self.pushSave = QtWidgets.QPushButton(self.centralwidget)
+		self.pushSave.setMaximumSize(QtCore.QSize(100, 16777215))
+		self.pushSave.setObjectName("pushSave")
+		self.horizontalLayout.addWidget(self.pushSave)
+		self.pushCancel = QtWidgets.QPushButton(self.centralwidget)
+		self.pushCancel.setMaximumSize(QtCore.QSize(100, 16777215))
+		self.pushCancel.setObjectName("pushCancel")
+		self.horizontalLayout.addWidget(self.pushCancel)
+		self.verticalLayout.addLayout(self.horizontalLayout)
+		ArtistManager.setCentralWidget(self.centralwidget)
+
+		self.retranslateUi(ArtistManager)
+		self.tabWidget.setCurrentIndex(0)
+		QtCore.QMetaObject.connectSlotsByName(ArtistManager)
+
+	def retranslateUi(self, ArtistManager):
+		_translate = QtCore.QCoreApplication.translate
+		ArtistManager.setWindowTitle(_translate("ArtistManager", "Artist"))
+		self.lineAliasName.setPlaceholderText(_translate("ArtistManager", "New Alias"))
+		self.lineAliasUrl.setPlaceholderText(_translate("ArtistManager", "URL (optional)"))
+		self.pushSaveAlias.setText(_translate("ArtistManager", "+"))
+		self.pushRemoveAlias.setText(_translate("ArtistManager", "-"))
+		self.labelName.setText(_translate("ArtistManager", "Name"))
+		self.pushDelete.setText(_translate("ArtistManager", "-"))
+		self.label.setText(_translate("ArtistManager", "Aliases"))
+		self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("ArtistManager", "Artist"))
+		self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("ArtistManager", "Art"))
+		self.pushSave.setText(_translate("ArtistManager", "Save"))
+		self.pushSave.setProperty("class", _translate("ArtistManager", "primary"))
+		self.pushCancel.setText(_translate("ArtistManager", "Close"))
+		self.pushCancel.setProperty("class", _translate("ArtistManager", "default"))
+
+
+if __name__ == "__main__":
+	import sys
+	app = QtWidgets.QApplication(sys.argv)
+	ArtistManager = QtWidgets.QMainWindow()
+	ui = Ui_ArtistManager()
+	ui.setupUi(ArtistManager)
+	ArtistManager.show()
+	sys.exit(app.exec_())
