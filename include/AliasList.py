@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 class AliasList:
     @staticmethod
-    def createListItem(listWidget: QtWidgets.QListWidget, alias: Alias):
+    def createListItem(listWidget: QtWidgets.QListWidget, alias: Alias) -> QtWidgets.QListWidgetItem:
         text = alias.name + (("\n{0}".format(alias.url)) if alias.url else "")
         item = QtWidgets.QListWidgetItem(text, listWidget)
         image = None

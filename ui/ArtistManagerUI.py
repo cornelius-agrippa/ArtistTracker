@@ -30,6 +30,7 @@ class Ui_ArtistManager(object):
 		self.listAlias = QtWidgets.QListWidget(self.tab)
 		self.listAlias.setGeometry(QtCore.QRect(10, 90, 551, 221))
 		self.listAlias.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+		self.listAlias.setIconSize(QtCore.QSize(50, 50))
 		self.listAlias.setObjectName("listAlias")
 		self.lineAliasName = QtWidgets.QLineEdit(self.tab)
 		self.lineAliasName.setGeometry(QtCore.QRect(10, 320, 141, 20))

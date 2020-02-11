@@ -74,6 +74,21 @@ class ArtistManager(QtWidgets.QMainWindow):
         self.parent.displayArtists()
         self.close()
 
+    def onDeleteArtist(self):
+        if not self.artist.id:
+            return
+
+        qm = QtWidgets.QMessageBox.question(self, 'Delete Artist?', "Are you sure you want to delete this artist? All data associated with this entry will be permanently removed.", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+
+        if qm == QtWidgets.QMessageBox.No:
+            return
+
+        self.parent.dal.deleteArtist(self.artist.id)
+        self.parent.loadArtists()
+        self.parent.displayArtists()
+
+        self.close()
+
     ############################################################################
     # Alias Management
     def loadAliases(self):
@@ -107,18 +122,3 @@ class ArtistManager(QtWidgets.QMainWindow):
             row = self.ui.listAlias.row(item)
             self.ui.listAlias.takeItem(row)
             self.artist.aliases[row].status = CrudStatus.deleted
-
-    def onDeleteArtist(self):
-        if not self.artist.id:
-            return
-
-        qm = QtWidgets.QMessageBox.question(self, 'Delete Artist?', "Are you sure you want to delete this artist? All data associated with this entry will be permanently removed.", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-
-        if qm == QtWidgets.QMessageBox.No:
-            return
-
-        self.parent.dal.deleteArtist(self.artist.id)
-        self.parent.loadArtists()
-        self.parent.displayArtists()
-
-        self.close()

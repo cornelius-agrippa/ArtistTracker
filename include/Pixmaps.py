@@ -6,7 +6,7 @@ icons = {
     "remove": ["./static/icons/remove.png"]
 }
 
-def getIcon(iconName: str):
+def getIcon(iconName: str) -> QtGui.QIcon():
     if iconName not in icons:
         raise IndexError("[Error] Unknown icon '{0}' is not defined in icons".format(iconName))
 
