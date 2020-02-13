@@ -22,8 +22,12 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.dal = DataLayer()
         self.dal.migrate()
 
+        # Artist lists
         self.artists = []
         self.filteredArtists = []
+
+        # Selected artist
+        self.artist = None
 
         self.loadServices()
         self.loadArtists()
@@ -38,7 +42,9 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.ui.tableArtists.currentCellChanged.connect(lambda row: self.onArtistChange(row))
         self.ui.tableArtists.doubleClicked.connect(lambda row: self.onArtistDetails(row))
 
-        self.ui.pushNewArtist.clicked.connect(lambda: self.onNewArtist())
+        self.ui.pushNewArtist.clicked.connect(self.onNewArtist)
+
+        self.ui.listAlias.customContextMenuRequested.connect(self.onAliasClick)
 
     def displayArtists(self):
         self.ui.tableArtists.setColumnCount(2)
@@ -68,6 +74,12 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.ui.tableArtists.resizeRowsToContents()
         self.ui.tableArtists.show()
 
+    def displayAliases(self):
+        self.ui.listAlias.clear()
+
+        for alias in self.artist.aliases:
+            AliasList.createListItem(self.ui.listAlias, alias)
+
     def onSearchArtists(self, searchTerm):
         if not len(searchTerm):
             self.filteredArtists = self.artists.copy()
@@ -85,24 +97,15 @@ class ArtistTracker(QtWidgets.QMainWindow):
 
     def loadServices(self):
         for service in self.dal.getServices():
-            Service.List[service[0]] = Service(service[0], service[1], service[2])
+            Service.List[service.id] = service
 
     def loadArtists(self):
-        self.artists.clear()
         self.filteredArtists.clear()
+        self.artists = self.dal.getArtists()
 
-        artists = self.dal.getArtists()
-
-        for artist in artists:
-            aliases = []
-            for alias in self.dal.getAliases(artist[0]):
-                aliases.append(Alias(alias[0], alias[1], alias[2], alias[3]))
-
-            arts = []
-            for art in self.dal.getArt(artist[0]):
-                arts.append(Art(art[0], art[1]))
-
-            self.artists.append(Artist(artist[0], artist[1], aliases, arts))
+        for i, artist in enumerate(self.artists):
+            self.artists[i].aliases = self.dal.getAliases(artist.id)
+            self.artists[i].arts    = self.dal.getArt(artist.id)
 
         self.filteredArtists = self.artists.copy()
 
@@ -127,16 +130,17 @@ class ArtistTracker(QtWidgets.QMainWindow):
             self.ui.listAlias.clear()
             return
 
+        self.artist = self.filteredArtists[row]
+
+        # Draw avatar
         if len(self.filteredArtists[row].art):
-            filepath = "./db/artists/{0}/{1}".format(self.filteredArtists[row].id, self.filteredArtists[row].art[0].filepath)
+            filepath = "./db/artists/{0}/{1}".format(artist.id, artist.art[0].filepath)
             self.setAvatar(filepath)
         else:
             self.clearAvatar()
 
-        self.ui.listAlias.clear()
-
-        for alias in self.filteredArtists[row].aliases:
-            AliasList.createListItem(self.ui.listAlias, alias)
+        # Set Alias list
+        self.displayAliases()
 
     def onNewArtist(self):
         self.amMainWindow = ArtistManager(self)
@@ -151,3 +155,33 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.amMainWindow = ArtistManager(self)
         self.amMainWindow.loadArtist(artist)
         self.amMainWindow.show()
+
+    def openUrl(self, url):
+        url = QtCore.QUrl(url)
+        if not QtGui.QDesktopServices.openUrl(url):
+            QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
+
+    def onAliasClick(self, event):
+        if not self.artist or not len(self.artist.aliases):
+            return
+
+        itemAt = self.ui.listAlias.itemAt(event)
+        item = self.ui.listAlias.row(itemAt)
+        alias = self.artist.aliases[item]
+
+        menu = QtWidgets.QMenu()
+
+        if alias.url:
+            openLink = menu.addAction("Open Link")
+
+        removeAlias = menu.addAction("Remove Alias")
+
+        action = menu.exec_(self.ui.listAlias.viewport().mapToGlobal(event))
+
+        if alias.url and action == openLink:
+            self.openUrl(self.artist.aliases[item].url)
+
+        if action == removeAlias:
+            self.dal.deleteAlias(alias.id)
+            self.artist.aliases = self.dal.getAliases(self.artist.id)
+            self.displayAliases()

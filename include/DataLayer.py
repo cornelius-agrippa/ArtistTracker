@@ -1,7 +1,10 @@
 import sqlite3
+from typing import List
 
+from models.Art import Art
 from models.Alias import Alias
 from models.Artist import Artist
+from models.Service import Service
 
 # Data Access Layer class
 #   Connects with SQLite to perform CRUD operations
@@ -89,27 +92,33 @@ class DataLayer:
     def getLastMigration(self):
         return self.getLastRecord("migrations")
 
-    def getArtists(self):
+    def getArtists(self) -> List[Artist]:
         c = self.conn.cursor()
+        c.row_factory = lambda cursor, row: Artist(row[0], row[1])
+
         c.execute('''SELECT a.id, a.name
             FROM artists AS a
             --LEFT JOIN circles AS c ON c.id = a.id_circle
             ORDER BY name DESC'''
         )
+
         return c.fetchall()
 
-    def getAliases(self, idArtist: int):
+    def getAliases(self, idArtist: int) -> List[Alias]:
         c = self.conn.cursor()
+        c.row_factory = lambda cursor, row: Alias(row[0], row[1], row[2], row[3])
         c.execute('SELECT id, name, url, id_service, id_artist FROM aliases WHERE id_artist = ?', (idArtist,))
         return c.fetchall()
 
-    def getArt(self, idArtist: int):
+    def getArt(self, idArtist: int) -> List[Art]:
         c = self.conn.cursor()
+        c.row_factory = lambda cursor, row: Art(row[0], row[1])
         c.execute('SELECT filepath, rank FROM art WHERE id_artist = ? ORDER BY rank ASC', (idArtist,))
         return c.fetchall()
 
-    def getServices(self):
+    def getServices(self) -> List[Service]:
         c = self.conn.cursor()
+        c.row_factory = lambda cursor, row: Service(row[0], row[1], row[2])
         c.execute('SELECT id, name, icon FROM services')
         return c.fetchall()
 

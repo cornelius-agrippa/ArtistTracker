@@ -4,5 +4,5 @@ class Service:
         self.name: str = name
         self.icon: str = icon
 
-    # Static globally accessible service list
+    # Globally accessible service list
     List = {}

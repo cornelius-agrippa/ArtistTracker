@@ -26,18 +26,20 @@ class ArtistManager(QtWidgets.QMainWindow):
 
         self.ui.pushDelete.setIcon(Pixmaps.getIcon("delete"))
         self.ui.pushDelete.setText("")
-        self.ui.pushDelete.clicked.connect(lambda: self.onDeleteArtist())
+        self.ui.pushDelete.clicked.connect(self.onDeleteArtist)
 
         self.ui.pushSaveAlias.setIcon(Pixmaps.getIcon("save"))
         self.ui.pushSaveAlias.setText("")
-        self.ui.pushSaveAlias.clicked.connect(lambda: self.onNewAlias())
+        self.ui.pushSaveAlias.clicked.connect(self.onNewAlias)
 
         self.ui.pushRemoveAlias.setIcon(Pixmaps.getIcon("remove"))
         self.ui.pushRemoveAlias.setText("")
-        self.ui.pushRemoveAlias.clicked.connect(lambda: self.onRemoveAlias())
+        self.ui.pushRemoveAlias.clicked.connect(self.onRemoveAlias)
 
-        self.ui.pushSave.clicked.connect(lambda: self.onSaveArtist())
-        self.ui.pushCancel.clicked.connect(lambda: self.close())
+        self.ui.pushSave.clicked.connect(self.onSaveArtist)
+        self.ui.pushCancel.clicked.connect(self.close)
+
+        self.ui.pushSelectAvatar.clicked.connect(self.selectFile)
 
         self.ui.comboBoxServices.addItem("None")
 
@@ -122,3 +124,8 @@ class ArtistManager(QtWidgets.QMainWindow):
             row = self.ui.listAlias.row(item)
             self.ui.listAlias.takeItem(row)
             self.artist.aliases[row].status = CrudStatus.deleted
+
+    ############################################################################
+    # Avatar Management
+    def selectFile(self):
+        print(QtWidgets.QFileDialog.getOpenFileName()[0])
