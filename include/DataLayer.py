@@ -63,7 +63,7 @@ class DataLayer:
                 name TEXT NOT NULL,
                 url TEXT,
                 id_service INTEGER,
-                id_artist INTEGER,
+                id_artist INTEGER NOT NULL,
                 FOREIGN KEY(id_service) REFERENCES services(id),
                 FOREIGN KEY(id_artist) REFERENCES artists(id)
             )''');
@@ -156,7 +156,7 @@ class DataLayer:
     # Updates
     def updateArtist(self, artist: Artist):
         if not artist.id:
-            print ("[Error] Tried to update an Artist with no ID. Check if artist is valid.")
+            print ("[Error] Tried to update an Artist with no ID. Check if Artist is valid.")
             return False
 
         c = self.conn.cursor()
@@ -176,14 +176,24 @@ class DataLayer:
         return c.lastrowid
 
     def updateAlias(self, alias: Alias):
+        if not alias.id:
+            print ("[Error] Tried to update an Alias with no ID. Check if Alias is valid.")
+            return False
+
         c = self.conn.cursor()
         c.execute('''UPDATE aliases SET
             name = coalesce(?, name),
-            url = coalesce(?, status)
+            url = coalesce(?, url),
             id_service = coalesce(?, id_service),
             id_artist = coalesce(?, id_artist)
             WHERE id = ?
-        ''', (alias.name, alias.url, alias.idService, alias.idArtist, idAlias,))
+        ''', (
+            alias.name,
+            alias.url,
+            alias.idService,
+            alias.idArtist,
+            alias.id,
+        ))
         self.conn.commit()
 
         return c.lastrowid

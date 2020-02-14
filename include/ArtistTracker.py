@@ -30,6 +30,9 @@ class ArtistTracker(QtWidgets.QMainWindow):
         # Selected artist
         self.artist = None
 
+        # Selected alias
+        self.alias = None
+
         self.loadServices()
         self.loadArtists()
         self.displayArtists()
@@ -55,6 +58,7 @@ class ArtistTracker(QtWidgets.QMainWindow):
 
         self.ui.pushNewArtist.clicked.connect(self.onNewArtist)
 
+        self.ui.pushSaveAlias.clicked.connect(self.onSaveAlias)
         self.ui.pushClearAlias.clicked.connect(self.onClearAlias)
 
         self.ui.listAlias.customContextMenuRequested.connect(self.onAliasContext)
@@ -130,7 +134,6 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.filteredArtists = self.artists.copy()
 
 
-
     ############################################################################
     # Events
     def onArtistChange(self, row):
@@ -191,14 +194,35 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.ui.comboBoxServices.setCurrentIndex(serviceIndex)
 
     def onClearAlias(self):
+        self.alias = None
         self.ui.lineAliasName.setText("")
         self.ui.lineAliasUrl.setText("")
         self.ui.comboBoxServices.setCurrentIndex(0)
 
-    def onOpenUrl(self, url):
-        url = QtCore.QUrl(url)
-        if not QtGui.QDesktopServices.openUrl(url):
-            QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
+    def onSaveAlias(self):
+        aliasName = self.ui.lineAliasName.text().strip()
+
+        if not aliasName:
+            return
+
+        aliasUrl  = self.ui.lineAliasUrl.text().strip()
+        idService = self.ui.comboBoxServices.currentData()
+        idArtist = self.artist.id if self.artist.id else None
+
+        # Editing Alias
+        if self.alias:
+            alias = Alias(self.artist.id, aliasName, aliasUrl, idService, idArtist)
+            self.dal.updateAlias(alias)
+
+        # New Alias
+        else:
+            alias = Alias(self.artist.id, aliasName, aliasUrl, idService, idArtist)
+            self.dal.insertAlias(alias)
+
+        self.loadArtists()
+        self.displayArtists()
+
+        self.onClearAlias()
 
     def onAliasContext(self, event):
         if not self.artist or not len(self.artist.aliases):
@@ -234,3 +258,8 @@ class ArtistTracker(QtWidgets.QMainWindow):
             self.dal.deleteAlias(alias.id)
             self.artist.aliases = self.dal.getAliases(self.artist.id)
             self.displayAliases()
+
+    def onOpenUrl(self, url):
+        url = QtCore.QUrl(url)
+        if not QtGui.QDesktopServices.openUrl(url):
+            QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
