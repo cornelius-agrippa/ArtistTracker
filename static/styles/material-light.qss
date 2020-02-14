@@ -151,7 +151,7 @@ QTreeView::item:selected {
 }
 
 QTreeView QHeaderView:section {
-	background-color: #263238;
+	/*background-color: #263238;*/
 	color: #CFD8DC;
 	border: 0;
 }
@@ -276,7 +276,7 @@ QTreeView {
 }
 
 QMenu {
-	background-color: #263238;		/* File Menu Background color */
+	background-color: #FFFFFF;		/* File Menu Background color */
 	color: #546E7A;
 }
 

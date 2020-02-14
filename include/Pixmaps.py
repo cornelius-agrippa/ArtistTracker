@@ -1,9 +1,11 @@
 from PyQt5 import QtGui
 
 icons = {
+    "tick":   ["./static/icons/tick.png"],
     "save":   ["./static/icons/plus.png"],
     "delete": ["./static/icons/delete.png"],
-    "remove": ["./static/icons/remove.png"]
+    "remove": ["./static/icons/remove.png"],
+    "cancel": ["./static/icons/cancel.png"]
 }
 
 def getIcon(iconName: str) -> QtGui.QIcon():

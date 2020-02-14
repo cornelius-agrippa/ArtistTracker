@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from include.DataLayer import DataLayer
 from include.ArtistManager import ArtistManager
 from include.AliasList import AliasList
+import include.Pixmaps as Pixmaps
 
 from models.Service import Service
 from models.Artist import Artist
@@ -34,9 +35,19 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.displayArtists()
         self.clearAvatar()
 
+        # Load Assets
+        self.ui.pushSaveAlias.setIcon(Pixmaps.getIcon("tick"))
+        self.ui.pushSaveAlias.setText("")
+
+        self.ui.pushClearAlias.setIcon(Pixmaps.getIcon("cancel"))
+        self.ui.pushClearAlias.setText("")
+
+        self.ui.pushClearSearch.setIcon(Pixmaps.getIcon("cancel"))
+        self.ui.pushClearSearch.setText("")
+
         # Events
         self.ui.lineSearch.textChanged.connect(lambda search: self.onSearchArtists(search))
-        self.ui.pushClear.clicked.connect(lambda: self.ui.lineSearch.clear())
+        self.ui.pushClearSearch.clicked.connect(lambda: self.ui.lineSearch.clear())
 
         self.ui.tableArtists.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.ui.tableArtists.currentCellChanged.connect(lambda row: self.onArtistChange(row))
@@ -44,8 +55,12 @@ class ArtistTracker(QtWidgets.QMainWindow):
 
         self.ui.pushNewArtist.clicked.connect(self.onNewArtist)
 
-        self.ui.listAlias.customContextMenuRequested.connect(self.onAliasClick)
+        self.ui.pushClearAlias.clicked.connect(self.onClearAlias)
 
+        self.ui.listAlias.customContextMenuRequested.connect(self.onAliasContext)
+
+    ############################################################################
+    # UI management
     def displayArtists(self):
         self.ui.tableArtists.setColumnCount(2)
 
@@ -80,35 +95,6 @@ class ArtistTracker(QtWidgets.QMainWindow):
         for alias in self.artist.aliases:
             AliasList.createListItem(self.ui.listAlias, alias)
 
-    def onSearchArtists(self, searchTerm):
-        if not len(searchTerm):
-            self.filteredArtists = self.artists.copy()
-        else:
-            self.filteredArtists = list(filter(
-                lambda artist:
-                    searchTerm.lower() in artist.name.lower()
-                    or list(filter(
-                        lambda alias:
-                            searchTerm.lower() in alias.name.lower(),
-                        artist.aliases)),
-                self.artists))
-
-        self.displayArtists()
-
-    def loadServices(self):
-        for service in self.dal.getServices():
-            Service.List[service.id] = service
-
-    def loadArtists(self):
-        self.filteredArtists.clear()
-        self.artists = self.dal.getArtists()
-
-        for i, artist in enumerate(self.artists):
-            self.artists[i].aliases = self.dal.getAliases(artist.id)
-            self.artists[i].arts    = self.dal.getArt(artist.id)
-
-        self.filteredArtists = self.artists.copy()
-
     def setAvatar(self, filepath):
         if not os.path.exists(filepath):
             clearAvatar()
@@ -124,6 +110,29 @@ class ArtistTracker(QtWidgets.QMainWindow):
     def clearAvatar(self):
         self.setAvatar('./static/no-image.jpg')
 
+    ############################################################################
+    # Data
+    def loadServices(self):
+        self.ui.comboBoxServices.addItem("None")
+
+        for service in self.dal.getServices():
+            Service.List[service.id] = service
+            self.ui.comboBoxServices.addItem(QtGui.QIcon(service.icon), service.name, service.id)
+
+    def loadArtists(self):
+        self.filteredArtists.clear()
+        self.artists = self.dal.getArtists()
+
+        for i, artist in enumerate(self.artists):
+            self.artists[i].aliases = self.dal.getAliases(artist.id)
+            self.artists[i].arts    = self.dal.getArt(artist.id)
+
+        self.filteredArtists = self.artists.copy()
+
+
+
+    ############################################################################
+    # Events
     def onArtistChange(self, row):
         if not len(self.filteredArtists):
             self.clearAvatar()
@@ -146,6 +155,21 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.amMainWindow = ArtistManager(self)
         self.amMainWindow.show()
 
+    def onSearchArtists(self, searchTerm):
+        if not len(searchTerm):
+            self.filteredArtists = self.artists.copy()
+        else:
+            self.filteredArtists = list(filter(
+                lambda artist:
+                    searchTerm.lower() in artist.name.lower()
+                    or list(filter(
+                        lambda alias:
+                            searchTerm.lower() in alias.name.lower(),
+                        artist.aliases)),
+                self.artists))
+
+        self.displayArtists()
+
     def onArtistDetails(self, index: QtCore.QModelIndex):
         if (index.row() > len(self.filteredArtists) - 1):
             return
@@ -156,12 +180,27 @@ class ArtistTracker(QtWidgets.QMainWindow):
         self.amMainWindow.loadArtist(artist)
         self.amMainWindow.show()
 
-    def openUrl(self, url):
+    def onSelectAlias(self):
+        if not self.alias:
+            return
+
+        self.ui.lineAliasName.setText(self.alias.name)
+        self.ui.lineAliasUrl.setText(self.alias.url)
+
+        serviceIndex = self.ui.comboBoxServices.findData(self.alias.idService) if self.alias.idService else 0
+        self.ui.comboBoxServices.setCurrentIndex(serviceIndex)
+
+    def onClearAlias(self):
+        self.ui.lineAliasName.setText("")
+        self.ui.lineAliasUrl.setText("")
+        self.ui.comboBoxServices.setCurrentIndex(0)
+
+    def onOpenUrl(self, url):
         url = QtCore.QUrl(url)
         if not QtGui.QDesktopServices.openUrl(url):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
 
-    def onAliasClick(self, event):
+    def onAliasContext(self, event):
         if not self.artist or not len(self.artist.aliases):
             return
 
@@ -174,14 +213,24 @@ class ArtistTracker(QtWidgets.QMainWindow):
         if alias.url:
             openLink = menu.addAction("Open Link")
 
-        removeAlias = menu.addAction("Remove Alias")
+        editAlias = menu.addAction("Edit Alias")
+        removeAlias = menu.addAction("Delete Alias")
 
         action = menu.exec_(self.ui.listAlias.viewport().mapToGlobal(event))
 
         if alias.url and action == openLink:
-            self.openUrl(self.artist.aliases[item].url)
+            self.onOpenUrl(self.artist.aliases[item].url)
+
+        if action == editAlias:
+            self.alias = alias
+            self.onSelectAlias()
 
         if action == removeAlias:
+            qm = QtWidgets.QMessageBox.question(self, 'Delete Alias?', "Are you sure you want to delete this alias?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+
+            if qm == QtWidgets.QMessageBox.No:
+                return
+
             self.dal.deleteAlias(alias.id)
             self.artist.aliases = self.dal.getAliases(self.artist.id)
             self.displayAliases()
